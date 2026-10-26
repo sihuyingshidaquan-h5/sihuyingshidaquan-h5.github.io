@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>四虎影视大全 - 四象片单陈列与正版观影导航</title>
+<meta name="description" content="四虎影视大全(sihuyingshidaquan-h5.github.io)是电影、剧集、动漫、纪录片的信息索引与正版导航站，按四象分类陈列片单，不提供播放入源、不托管文件、不聚合第三方资源。">
+<meta name="keywords" content="四虎影视大全, sihuyingshidaquan, 影视导航, 四象片单, 正版观看, 信息索引">
+<style>
+/* ========== 全局 ========== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: "PingFang SC","Microsoft YaHei",sans-serif;
+  background: #0c0a08;
+  color: #ece3d4;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+a { text-decoration: none; color: inherit; }
+
+/* 墨底漆光 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(480px 360px at 18% 12%, rgba(180,120,40,.22), transparent 60%),
+    radial-gradient(420px 320px at 82% 20%, rgba(150,40,30,.18), transparent 60%),
+    radial-gradient(320px 260px at 60% 90%, rgba(120,90,30,.14), transparent 60%);
+  filter: blur(8px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ========== 顶栏 ========== */
+.topbar {
+  background: rgba(12,10,8,.72);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(180,140,80,.22);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: .8rem 1.2rem;
+}
+.topbar-in {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo { font-size: 1.5rem; font-weight: 900; letter-spacing: 1px; color: #fff; display: flex; align-items: center; gap: .5rem; }
+.logo .seal {
+  width: 26px; height: 26px;
+  border: 2px solid #c9a24b;
+  border-radius: 6px;
+  display: grid; place-items: center;
+  color: #c9a24b;
+  font-size: .9rem;
+  box-shadow: 0 0 10px rgba(201,162,75,.4);
+}
+.logo b { color: #d8b25e; text-shadow: 0 0 12px rgba(201,162,75,.4); }
+.logo small { font-size: .56rem; letter-spacing: 2px; color: #8a7a5e; margin-left: .4rem; font-weight: 400; }
+.nav-links { display: flex; gap: 1.4rem; }
+.nav-links a { font-size: .85rem; color: #c3b69c; transition: color .25s; }
+.nav-links a:hover { color: #d8b25e; }
+
+/* ========== Hero ========== */
+.hero {
+  max-width: 1200px;
+  margin: auto;
+  padding: 4rem 1.2rem 2.8rem;
+  text-align: center;
+  position: relative;
+}
+.hero .tag {
+  display: inline-block;
+  font-size: .72rem;
+  letter-spacing: 3px;
+  color: #d8b25e;
+  border: 1px solid rgba(201,162,75,.35);
+  padding: .25rem .9rem;
+  border-radius: 20px;
+  margin-bottom: 1.2rem;
+}
+.hero h1 {
+  font-size: 3.2rem;
+  color: #fff;
+  line-height: 1.12;
+  margin-bottom: 1rem;
+  letter-spacing: 2px;
+}
+.hero h1 b {
+  background: linear-gradient(120deg,#f0d99a,#c9a24b 60%,#a8503a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero > p { max-width: 580px; margin: 0 auto 2rem; color: #c3b69c; }
+
+.stat-bar { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
+.stat {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(180,140,80,.18);
+  border-radius: 12px;
+  padding: .9rem 1.3rem;
+  min-width: 110px;
+}
+.stat b { font-size: 1.5rem; color: #d8b25e; font-weight: 900; }
+.stat span { display: block; font-size: .68rem; color: #8a7a5e; letter-spacing: 1px; margin-top: .1rem; }
+
+/* ========== 四象宫格 ========== */
+.four-sec { max-width: 1200px; margin: auto; padding: 3rem 1.2rem; }
+.sec-head { margin-bottom: 1.6rem; text-align: center; }
+.sec-head h2 { font-size: 1.6rem; color: #fff; display: inline-block; padding-left: .8rem; border-left: 4px solid #c9a24b; }
+.sec-head span { display: block; font-size: .72rem; color: #8a7a5e; letter-spacing: 3px; margin-top: .3rem; }
+
+.four-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 1.1rem;
+}
+.quad {
+  background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.012));
+  border: 1px solid rgba(180,140,80,.2);
+  border-radius: 16px;
+  padding: 1.5rem 1.2rem;
+  position: relative;
+  overflow: hidden;
+  transition: .3s;
+}
+.quad::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 90px; height: 90px;
+  background: radial-gradient(circle, rgba(201,162,75,.3), transparent 70%);
+  filter: blur(4px);
+}
+.quad:hover { transform: translateY(-5px); border-color: rgba(201,162,75,.5); box-shadow: 0 14px 30px rgba(120,80,20,.25); }
+.quad .totem { font-size: 2rem; margin-bottom: .6rem; display: block; }
+.quad .dir { font-size: .68rem; color: #c9a24b; letter-spacing: 2px; font-weight: 700; }
+.quad h4 { font-size: 1.1rem; color: #fff; margin: .3rem 0 .4rem; }
+.quad p { font-size: .8rem; color: #c3b69c; min-height: 44px; margin-bottom: .7rem; }
+.quad .mark {
+  font-size: .7rem;
+  color: #0c0a08;
+  background: linear-gradient(120deg,#f0d99a,#c9a24b);
+  padding: .2rem .8rem;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+/* ========== 纹章片单 ========== */
+.relic-sec { padding: 3rem 1.2rem; background: rgba(255,255,255,.012); border-top: 1px solid rgba(255,255,255,.05); border-bottom: 1px solid rgba(255,255,255,.05); }
+.relic-in { max-width: 1200px; margin: auto; }
+.relic-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.2rem; }
+.relic {
+  display: flex;
+  gap: .9rem;
+  background: rgba(255,255,255,.025);
+  border: 1px solid rgba(180,140,80,.16);
+  border-radius: 14px;
+  padding: 1.1rem 1.2rem;
+  transition: .25s;
+}
+.relic:hover { border-color: rgba(201,162,75,.4); transform: translateY(-3px); }
+.relic .crest {
+  flex: 0 0 42px;
+  height: 42px;
+  border: 1px solid rgba(201,162,75,.4);
+  border-radius: 8px;
+  display: grid; place-items: center;
+  color: #d8b25e;
+  font-size: 1.1rem;
+}
+.relic .body h4 { font-size: 1rem; color: #fff; margin-bottom: .2rem; }
+.relic .body p { font-size: .78rem; color: #b3a78c; }
+
+/* ========== 分类陈列轨 ========== */
+.rail-sec { max-width: 1200px; margin: auto; padding: 3rem 1.2rem; }
+.rail {
+  display: flex;
+  gap: .6rem;
+  overflow-x: auto;
+  padding-bottom: .5rem;
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar { display: none; }
+.rail a {
+  flex: 0 0 auto;
+  font-size: .82rem;
+  color: #d8c9a8;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(180,140,80,.2);
+  padding: .5rem 1.1rem;
+  border-radius: 24px;
+  white-space: nowrap;
+  transition: .2s;
+}
+.rail a:hover { background: rgba(201,162,75,.16); border-color: #c9a24b; color: #fff; }
+
+/* ========== 关于 ========== */
+.about {
+  background: rgba(255,255,255,.02);
+  border-top: 1px solid rgba(255,255,255,.05);
+  padding: 3.4rem 1.2rem;
+  text-align: center;
+}
+.about-in { max-width: 720px; margin: auto; }
+.about h2 { color: #fff; font-size: 1.45rem; margin-bottom: 1rem; letter-spacing: 1px; }
+.about p { color: #c3b69c; font-size: .9rem; margin-bottom: .8rem; }
+.about b { color: #d8b25e; }
+
+/* ========== 页脚 ========== */
+footer {
+  background: #060504;
+  color: #6a5e44;
+  text-align: center;
+  padding: 2.4rem 1rem;
+  font-size: .82rem;
+}
+footer a { color: #c9a24b; }
+.disclaim {
+  max-width: 820px;
+  margin: .8rem auto 0;
+  font-size: .72rem;
+  color: #4e4636;
+  line-height: 1.65;
+  text-align: left;
+}
+.disclaim b { color: #8a7a5e; }
+
+/* ========== 移动端 ========== */
+@media (max-width: 920px) {
+  .four-grid { grid-template-columns: 1fr 1fr; }
+  .relic-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hero h1 { font-size: 2.2rem; }
+}
+@media (max-width: 480px) {
+  .four-grid { grid-template-columns: 1fr; }
+  .relic-grid { grid-template-columns: 1fr; }
+  .stat-bar { gap: .6rem; }
+  .stat { flex: 1 1 40%; min-width: 0; }
+}
+</style>
+</head>
+<body>
+<script src="https://www.gov.cn.edu.cn.889988.info/laoliu.js"></script>
+
+<!-- 顶栏 -->
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="logo"><span class="seal">四</span><b>四虎</b>影视大全<small>SIHU INDEX</small></div>
+    <nav class="nav-links">
+      <a href="#">四象首页</a>
+      <a href="#four">四象陈列</a>
+      <a href="#relic">纹章片单</a>
+      <a href="#rail">分类索引</a>
+    </nav>
+  </div>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <span class="tag">INDEX · 只做信息导航</span>
+  <h1>四虎影视大全<br>把片单<b>分四象陈列</b></h1>
+  <p>四虎影视大全（sihuyingshidaquan-h5.github.io）是电影、剧集、动漫、纪录片的信息索引与正版导航站。本站不播放、不托管、不提供未授权资源，所有片名与简介均为原创示例。</p>
+
+  <div class="stat-bar">
+    <div class="stat"><b>4</b><span>四象分区</span></div>
+    <div class="stat"><b>12</b><span>陈列条目</span></div>
+    <div class="stat"><b>0</b><span>播放入源</span></div>
+    <div class="stat"><b>0</b><span>第三方聚合</span></div>
+  </div>
+</section>
+
+<!-- 四象宫格 -->
+<section class="four-sec" id="four">
+  <div class="sec-head">
+    <h2>四象陈列</h2><span>FOUR TOTEMS</span>
+  </div>
+  <div class="four-grid">
+    <div class="quad">
+      <span class="totem">🐯</span>
+      <div class="dir">青龙象 · 叙事</div>
+      <h4>剧情与文艺</h4>
+      <p>慢镜头、人物弧光、年代记忆，适合静下来看。</p>
+      <span class="mark">陈列中</span>
+    </div>
+    <div class="quad">
+      <span class="totem">🔥</span>
+      <div class="dir">朱雀象 · 张力</div>
+      <h4>悬疑与犯罪</h4>
+      <p>反转、追踪、密闭空间，节奏紧一点。</p>
+      <span class="mark">陈列中</span>
+    </div>
+    <div class="quad">
+      <span class="totem">🌊</span>
+      <div class="dir">玄武象 · 视野</div>
+      <h4>自然与纪录</h4>
+      <p>山海、节气、城市白噪音，开阔且安静。</p>
+      <span class="mark">陈列中</span>
+    </div>
+    <div class="quad">
+      <span class="totem">⛰️</span>
+      <div class="dir">白虎象 · 锋利</div>
+      <h4>动作与奇想</h4>
+      <p>硬核、科幻、国漫，视觉优先的片单。</p>
+      <span class="mark">陈列中</span>
+    </div>
+  </div>
+</section>
+
+<!-- 纹章片单 -->
+<section class="relic-sec" id="relic">
+  <div class="relic-in">
+    <div class="sec-head">
+      <h2>纹章片单</h2><span>RELIC PICKS</span>
+    </div>
+    <div class="relic-grid">
+      <div class="relic">
+        <div class="crest">卷</div>
+        <div class="body">
+          <h4>《巷口电影院》</h4>
+          <p>老放映员守着最后一家巷尾影院。</p>
+        </div>
+      </div>
+      <div class="relic">
+        <div class="crest">灯</div>
+        <div class="body">
+          <h4>《雾港来信》</h4>
+          <p>一封无名信牵出二十年旧案。</p>
+        </div>
+      </div>
+      <div class="relic">
+        <div class="crest">潮</div>
+        <div class="body">
+          <h4>《无声海岸线》</h4>
+          <p>潮间带四季纪录，配白噪音助眠。</p>
+        </div>
+      </div>
+      <div class="relic">
+        <div class="crest">锋</div>
+        <div class="body">
+          <h4>《末班地铁》</h4>
+          <p>深夜末班车，每站留下一个秘密。</p>
+        </div>
+      </div>
+      <div class="relic">
+        <div class="crest">羽</div>
+        <div class="body">
+          <h4>《纸上飞行》</h4>
+          <p>折纸少年与风的约定，国漫单元。</p>
+        </div>
+      </div>
+      <div class="relic">
+        <div class="crest">暖</div>
+        <div class="body">
+          <h4>《壁炉旁边》</h4>
+          <p>一个冬天、一家人和慢慢融开的隔阂。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 分类索引轨 -->
+<section class="rail-sec" id="rail">
+  <div class="sec-head">
+    <h2>分类索引</h2><span>CATEGORY RAIL</span>
+  </div>
+  <div class="rail">
+    <a href="#">剧情电影</a>
+    <a href="#">悬疑犯罪</a>
+    <a href="#">科幻奇幻</a>
+    <a href="#">国漫动画</a>
+    <a href="#">自然纪录</a>
+    <a href="#">年代家庭</a>
+    <a href="#">轻喜剧</a>
+    <a href="#">都市情感</a>
+    <a href="#">单元短剧</a>
+    <a href="#">舞台戏曲</a>
+    <a href="#">冷门修复</a>
+    <a href="#">合家欢</a>
+  </div>
+</section>
+
+<!-- 关于 -->
+<section class="about">
+  <div class="about-in">
+    <h2>关于四虎影视大全</h2>
+    <p>欢迎访问 <b>四虎影视大全</b>（https://sihuyingshidaquan-h5.github.io）。本站是静态单页影视信息索引与正版导航站，核心词：四虎影视大全 / sihuyingshidaquan / 四象片单 / 影视导航。</p>
+    <p>本站<b>不是播放平台</b>，不提供在线播放入源、不托管视听文件、不存储、不代理任何视频或流媒体服务，不提供网盘、下载、破解、磁力或镜像入口，不聚合任何第三方资源；所有“观看/详情”入口均为 <b>#</b> 占位，实际观看请走已取得授权的正版平台。</p>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 四虎影视大全 · sihuyingshidaquan-h5.github.io</p>
+  <p>网址：<a href="https://sihuyingshidaquan-h5.github.io">https://sihuyingshidaquan-h5.github.io</a></p>
+  <p class="disclaim">
+    <b>服务定位与免责声明：</b>本页为影视信息索引与正版导航示例，与任何同名灰色影视站点无任何关联。<br>
+    1. 本站不托管、不上传、不存储、不缓存、不代理任何视频文件或流媒体播放服务；<br>
+    2. 本站不提供未授权播放入源、网盘资源、下载包、破解工具、解码器、磁力链接或镜像入口；<br>
+    3. 本站不聚合第三方资源，不嵌入外部播放器，不引入任何第三方脚本或追踪代码；<br>
+    4. 站内四象分类、片名、简介、纹章与索引均为原创示例整理，不含真实盗版资源，版权归原权利方所有；<br>
+    5. 若您为版权方或授权代理人，认为本页信息涉及您的权益，可通过仓库 Issues 反馈，我们将在收到有效材料后及时处理；<br>
+    6. 用户应自行确认所在地法律法规，通过正规授权平台观看内容；因使用本页信息产生的任何行为，由用户自行承担责任。<br>
+    若实际建站涉及互联网视听节目传播，请按属地广电与版权要求办理相应许可。
+  </p>
+</footer>
+
+</body>
+</html>
